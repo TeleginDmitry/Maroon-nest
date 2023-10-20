@@ -9,9 +9,9 @@ import {
     ValidationPipe
 } from '@nestjs/common'
 import { ProductService } from './product.service'
-import { CreateDto } from './dto/product.dto'
+import { CreateProductDto } from './dto/product.dto'
 
-@Controller('api/products')
+@Controller('products')
 export class ProductController {
     constructor(private readonly appService: ProductService) {}
 
@@ -27,7 +27,7 @@ export class ProductController {
 
     @UsePipes(new ValidationPipe())
     @Post()
-    createProduct(@Body() dto: CreateDto) {
+    createProduct(@Body() dto: CreateProductDto) {
         return this.appService.createProduct(dto)
     }
 }
