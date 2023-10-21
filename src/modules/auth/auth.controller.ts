@@ -8,10 +8,7 @@ import {
     ValidationPipe,
     Headers
 } from '@nestjs/common'
-import {
-    HeadersUserDto,
-    LoginUserDto,
-    RegisterUserDto} from './dto/auth.dto'
+import { HeadersUserDto, LoginUserDto, RegisterUserDto } from './dto/auth.dto'
 import { AuthService } from './auth.service'
 
 @Controller('auth')
