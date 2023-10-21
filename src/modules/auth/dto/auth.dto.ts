@@ -21,3 +21,8 @@ export class LoginUserDto {
     @IsString()
     password: string
 }
+
+export class HeadersUserDto {
+    @IsString()
+    authorization?: string
+}

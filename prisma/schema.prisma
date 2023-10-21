@@ -15,6 +15,12 @@ model User {
   image    String
 }
 
+model BlacklistToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  createdAt DateTime @default(now())
+}
+
 model Accordion {
   id        Int     @id @default(autoincrement())
   title     String
