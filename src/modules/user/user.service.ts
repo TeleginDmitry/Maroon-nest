@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { DatabaseService } from 'src/modules/database/database.service'
 import * as bcrypt from 'bcrypt'
 import { CreateUserDto, ValidateUserDto } from './dto/user.dto'
-import selectException from 'src/shared/exceptions'
+import selectException from 'src/shared/exceptions/exceptions'
 
 @Injectable()
 export class UserService {
@@ -11,12 +11,12 @@ export class UserService {
     async validateUser({ email, password }: ValidateUserDto) {
         const user = await this.findUserByEmail(email)
         if (!user) {
-            throw selectException('USER_EMAIL_NOT_EXIST')
+            throw selectException('user_email_not_exist')
         }
 
         const passwordMatch = await bcrypt.compare(password, user.password)
         if (!passwordMatch) {
-            throw selectException('INCORRECT_PASSWORD')
+            throw selectException('incorrect_password')
         }
 
         const resultUser = { ...user }
@@ -28,7 +28,7 @@ export class UserService {
     async createUser({ email, password, ...dto }: CreateUserDto) {
         const isExistUser = await this.findUserByEmail(email)
         if (isExistUser) {
-            throw selectException('USER_EMAIL_EXIST')
+            throw selectException('user_email_exist')
         }
 
         const hashedPassword = await bcrypt.hash(password, 10)
