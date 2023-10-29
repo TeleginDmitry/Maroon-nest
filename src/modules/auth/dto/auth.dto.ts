@@ -10,7 +10,6 @@ export class RegisterUserDto {
     @IsString()
     password: string
 
-    @IsString()
     image: string
 }
 
@@ -22,7 +21,7 @@ export class LoginUserDto {
     password: string
 }
 
-export class HeadersUserDto {
+export class CustomHeadersDto {
     @IsString()
-    authorization?: string
+    authorization: string
 }
