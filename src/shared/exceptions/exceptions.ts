@@ -14,6 +14,7 @@ const exceptions = {
     token_blacklisted: new UnauthorizedException(
         'Токен находится в чёрном списке'
     ),
+    incorrect_token: new UnauthorizedException('Невалидный токен'),
     token_not_exist: new HttpException('Токен не был передан', 400)
 }
 

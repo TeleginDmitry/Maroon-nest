@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common'
 import { DatabaseService } from 'src/modules/database/database.service'
 import * as bcrypt from 'bcrypt'
-import { CreateUserDto, ValidateUserDto } from './dto/user.dto'
+import { ChangeUserDto, CreateUserDto, ValidateUserDto } from './dto/user.dto'
 import selectException from 'src/shared/exceptions/exceptions'
+import { UserValidatedResponseDto } from 'src/shared/dto/user.dto'
 
 @Injectable()
 export class UserService {
@@ -53,6 +54,21 @@ export class UserService {
     async findUserByEmail(email: string) {
         return this.databaseService.user.findUnique({
             where: { email }
+        })
+    }
+
+    async changeUser(dto: ChangeUserDto, request) {
+        const { user }: UserValidatedResponseDto = request.user
+
+        return this.databaseService.user.update({
+            data: dto,
+            where: { id: user.id },
+            select: {
+                email: true,
+                id: true,
+                image: true,
+                name: true
+            }
         })
     }
 }

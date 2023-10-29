@@ -10,18 +10,30 @@ export class TokenService {
         private readonly databaseService: DatabaseService
     ) {}
 
-    async generateJwtToken(user: any) {
+    async createAccessToken(user) {
         return this.jwtService.sign(
             { user },
             {
-                secret: selectConfiguration('secret_jwt'),
-                expiresIn: selectConfiguration('expire_jwt')
+                expiresIn: selectConfiguration('expire_access_token'),
+                secret: selectConfiguration('secret_jwt')
             }
         )
     }
 
-    async verifyJwtToken(token: string) {
-        return this.jwtService.decode(token)
+    async createRefreshToken(user) {
+        return this.jwtService.sign(
+            { user },
+            {
+                expiresIn: selectConfiguration('expire_refresh_token'),
+                secret: selectConfiguration('secret_jwt')
+            }
+        )
+    }
+
+    async verifyToken<T extends object>(token: string): Promise<T> {
+        return this.jwtService.verify(token, {
+            secret: selectConfiguration('secret_jwt')
+        })
     }
 
     async addToBlacklist(token: string) {
