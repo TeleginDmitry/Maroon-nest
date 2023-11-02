@@ -1,4 +1,4 @@
-import { UserValidatedDto } from 'src/shared/dto/user.dto'
+import { UserValidatedDto } from 'src/shared/dto/user/user.dto'
 
 export class ValidateJWTDto {
     user: UserValidatedDto

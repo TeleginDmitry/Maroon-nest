@@ -6,6 +6,7 @@ import { AuthModule } from '../auth/auth.module'
 import { TokenModule } from '../token/token.module'
 import { JwtStrategy } from './jwt.strategy'
 import { CookieParserMiddleware } from './cookie-parser.middleware'
+import { FilterModule } from '../filter/filter.module'
 
 @Module({
     imports: [
@@ -13,7 +14,8 @@ import { CookieParserMiddleware } from './cookie-parser.middleware'
         ProductModule,
         UserModule,
         AuthModule,
-        TokenModule
+        TokenModule,
+        FilterModule
     ],
     providers: [JwtStrategy]
 })

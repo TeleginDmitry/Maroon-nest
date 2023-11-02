@@ -9,7 +9,8 @@ const configurations = {
     port: process.env.PORT,
     secret_jwt: process.env.SECRET_JWT,
     expire_access_token: process.env.EXPIRE_ACCESS_JWT,
-    expire_refresh_token: process.env.EXPIRE_REFRESH_JWT
+    expire_refresh_token: process.env.EXPIRE_REFRESH_JWT,
+    images_folder: process.env.IMAGES_FOLDER
 }
 
 export function selectConfiguration(

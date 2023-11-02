@@ -10,6 +10,10 @@ const exceptions = {
         'Пользователь с таким email не существует',
         400
     ),
+    product_email_exist: new HttpException(
+        'Продукт с таким email уже существует',
+        400
+    ),
     incorrect_password: new HttpException('Неверный пароль', 400),
     token_blacklisted: new UnauthorizedException(
         'Токен находится в чёрном списке'

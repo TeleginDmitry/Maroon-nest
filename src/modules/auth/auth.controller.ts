@@ -15,7 +15,11 @@ import {
     ParseFilePipe,
     FileTypeValidator
 } from '@nestjs/common'
-import { CustomHeadersDto, LoginUserDto, RegisterUserDto } from './dto/auth.dto'
+import {
+    CustomHeadersDto,
+    LoginUserDto,
+    RegisterUserDto
+} from '../../shared/dto/auth/auth.dto'
 import { AuthService } from './auth.service'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { diskStorage } from 'multer'
@@ -38,7 +42,6 @@ export class AuthController {
         })
     )
     register(
-        @Request() request,
         @UploadedFile(
             new ParseFilePipe({
                 validators: [
@@ -52,7 +55,7 @@ export class AuthController {
         @Body() dto: RegisterUserDto,
         @Response({ passthrough: true }) response
     ) {
-        dto.image = `${request.protocol}://${request.get('host')}/${image.path}`
+        dto.image = image.path
         return this.authService.register(dto, response)
     }
 
@@ -74,7 +77,7 @@ export class AuthController {
     @Get('verify')
     @UseGuards(new JwtAuthGuard())
     verify(@Request() request) {
-        return request.user
+        return this.authService.verify(request)
     }
 
     @Get('logout')

@@ -1,16 +1,22 @@
 import { Injectable } from '@nestjs/common'
 import { DatabaseService } from 'src/modules/database/database.service'
 import * as bcrypt from 'bcrypt'
-import { ChangeUserDto, CreateUserDto, ValidateUserDto } from './dto/user.dto'
 import selectException from 'src/shared/exceptions/exceptions'
-import { UserValidatedResponseDto } from 'src/shared/dto/user.dto'
+import {
+    ChangeUserDto,
+    CreateUserDto,
+    UserValidatedResponseDto,
+    ValidateUserDto
+} from 'src/shared/dto/user/user.dto'
+import { userHook } from 'src/hooks/user.hook'
 
 @Injectable()
 export class UserService {
     constructor(private readonly databaseService: DatabaseService) {}
 
     async validateUser({ email, password }: ValidateUserDto) {
-        const user = await this.findUserByEmail(email)
+        const user = await this.findUserByEmailWithPassword(email)
+
         if (!user) {
             throw selectException('user_email_not_exist')
         }
@@ -26,9 +32,10 @@ export class UserService {
         return resultUser
     }
 
-    async createUser({ email, password, ...dto }: CreateUserDto) {
-        const isExistUser = await this.findUserByEmail(email)
-        if (isExistUser) {
+    async createUser({ email, password, image, name }: CreateUserDto) {
+        const foundUser = await this.findUserByEmail(email)
+
+        if (foundUser) {
             throw selectException('user_email_exist')
         }
 
@@ -38,7 +45,8 @@ export class UserService {
             data: {
                 email,
                 password: hashedPassword,
-                ...dto
+                image,
+                name
             },
             select: {
                 email: true,
@@ -48,21 +56,26 @@ export class UserService {
             }
         })
 
+        if (user) {
+            await userHook(user)
+        }
+
         return user
     }
 
-    async findUserByEmail(email: string) {
-        return this.databaseService.user.findUnique({
-            where: { email }
-        })
-    }
+    async changeUser({ email, password, image, name }: ChangeUserDto, request) {
+        const authorizatedUser: UserValidatedResponseDto = request.user
 
-    async changeUser(dto: ChangeUserDto, request) {
-        const { user }: UserValidatedResponseDto = request.user
-
-        return this.databaseService.user.update({
-            data: dto,
-            where: { id: user.id },
+        const user = await this.databaseService.user.update({
+            data: {
+                email,
+                password,
+                image,
+                name
+            },
+            where: {
+                email: authorizatedUser.user.email
+            },
             select: {
                 email: true,
                 id: true,
@@ -70,5 +83,41 @@ export class UserService {
                 name: true
             }
         })
+
+        if (user) {
+            await userHook(user)
+        }
+
+        return user
+    }
+
+    async findUserByEmail(email: string) {
+        const user = await this.databaseService.user.findUnique({
+            where: { email },
+            select: {
+                email: true,
+                id: true,
+                image: true,
+                name: true
+            }
+        })
+
+        if (user) {
+            await userHook(user)
+        }
+
+        return user
+    }
+
+    private async findUserByEmailWithPassword(email: string) {
+        const user = await this.databaseService.user.findUnique({
+            where: { email }
+        })
+
+        if (user) {
+            await userHook(user)
+        }
+
+        return user
     }
 }
