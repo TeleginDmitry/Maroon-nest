@@ -11,13 +11,41 @@ import selectException from 'src/shared/exceptions/exceptions'
 export class ProductService {
     constructor(private readonly databaseService: DatabaseService) {}
 
-    async getProducts() {
-        return await this.databaseService.product.findMany({
+    async getProducts(categories?: string | undefined) {
+        const query: {
+            include: {
+                accordion: boolean
+                volumes: boolean
+            }
+            where?: {
+                categories?: {
+                    some?: {
+                        OR?: any
+                    }
+                }
+            }
+        } = {
             include: {
                 accordion: true,
                 volumes: true
             }
-        })
+        }
+
+        if (categories?.length) {
+            const categoriesArray = categories.split(',')
+
+            query.where = {
+                categories: {
+                    some: {
+                        OR: categoriesArray.map((category) => ({
+                            name: category
+                        }))
+                    }
+                }
+            }
+        }
+
+        return await this.databaseService.product.findMany(query)
     }
 
     async getRecentlyProducts(request) {

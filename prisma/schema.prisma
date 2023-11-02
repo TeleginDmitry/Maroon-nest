@@ -51,14 +51,6 @@ model Product {
   recentlyProduct RecentlyProduct[]
 }
 
-model RecentlyProduct {
-  id        Int     @id @default(autoincrement())
-  product   Product @relation(fields: [productId], references: [id])
-  productId Int
-  user      User    @relation(fields: [userId], references: [id])
-  userId    Int
-}
-
 model Category {
   id        Int      @id @default(autoincrement())
   name      String   @unique
@@ -72,4 +64,12 @@ model Filter {
   id         Int        @id @default(autoincrement())
   name       String     @unique
   categories Category[]
+}
+
+model RecentlyProduct {
+  id        Int     @id @default(autoincrement())
+  product   Product @relation(fields: [productId], references: [id])
+  productId Int
+  user      User    @relation(fields: [userId], references: [id])
+  userId    Int
 }
