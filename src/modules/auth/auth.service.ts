@@ -1,8 +1,12 @@
 import { Injectable } from '@nestjs/common'
 import { UserService } from 'src/modules/user/user.service'
-import { CustomHeadersDto, LoginUserDto, RegisterUserDto } from './dto/auth.dto'
+import {
+    CustomHeadersDto,
+    LoginUserDto,
+    RegisterUserDto
+} from '../../shared/dto/auth/auth.dto'
 import { TokenService } from '../token/token.service'
-import { UserValidatedResponseDto } from 'src/shared/dto/user.dto'
+import { UserValidatedResponseDto } from 'src/shared/dto/user/user.dto'
 import selectException from 'src/shared/exceptions/exceptions'
 
 @Injectable()
@@ -12,26 +16,54 @@ export class AuthService {
         private readonly tokenService: TokenService
     ) {}
 
-    async register(dto: RegisterUserDto, response) {
-        const user = await this.userService.createUser(dto)
+    async register(
+        { email, image, name, password }: RegisterUserDto,
+        response
+    ) {
+        const user = await this.userService.createUser({
+            email,
+            image,
+            name,
+            password
+        })
 
-        const refresh_token = await this.tokenService.createAccessToken(user)
-        const access_token = await this.tokenService.createAccessToken(user)
+        const refresh_token = await this.tokenService.createAccessToken({
+            email: user.email
+        })
+        const access_token = await this.tokenService.createAccessToken({
+            email: user.email
+        })
 
         response.cookie('refresh_token', refresh_token, { httpOnly: true })
 
         return { user, access_token }
     }
 
-    async login(dto: LoginUserDto, response) {
-        const user = await this.userService.validateUser(dto)
+    async login({ email, password }: LoginUserDto, response) {
+        const user = await this.userService.validateUser({ email, password })
 
-        const refresh_token = await this.tokenService.createAccessToken(user)
-        const access_token = await this.tokenService.createAccessToken(user)
+        const refresh_token = await this.tokenService.createAccessToken({
+            email: user.email
+        })
+        const access_token = await this.tokenService.createAccessToken({
+            email: user.email
+        })
 
         response.cookie('refresh_token', refresh_token, { httpOnly: true })
 
         return { user, access_token }
+    }
+
+    async verify(request) {
+        const email = request.user.user.email
+
+        const user = await this.userService.findUserByEmail(email)
+
+        if (!user) {
+            throw selectException('user_email_not_exist')
+        }
+
+        return user
     }
 
     async refresh(cookies, response) {
@@ -39,13 +71,6 @@ export class AuthService {
 
         if (!req_refresh_token) {
             throw selectException('token_not_exist')
-        }
-
-        const isTokenBlacklisted =
-            await this.tokenService.isTokenBlacklisted(req_refresh_token)
-
-        if (isTokenBlacklisted) {
-            throw selectException('token_blacklisted')
         }
 
         const { user } =
@@ -57,10 +82,21 @@ export class AuthService {
             throw selectException('incorrect_token')
         }
 
+        const isTokenBlacklisted =
+            await this.tokenService.isTokenBlacklisted(req_refresh_token)
+
+        if (isTokenBlacklisted) {
+            throw selectException('token_blacklisted')
+        }
+
         await this.tokenService.addToBlacklist(req_refresh_token)
 
-        const refresh_token = await this.tokenService.createAccessToken(user)
-        const access_token = await this.tokenService.createAccessToken(user)
+        const refresh_token = await this.tokenService.createAccessToken({
+            email: user.email
+        })
+        const access_token = await this.tokenService.createAccessToken({
+            email: user.email
+        })
 
         response.cookie('refresh_token', refresh_token, { httpOnly: true })
 

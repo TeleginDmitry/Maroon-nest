@@ -8,11 +8,12 @@ datasource db {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  name     String
-  email    String @unique
-  password String
-  image    String
+  id              Int               @id @default(autoincrement())
+  name            String
+  email           String            @unique
+  password        String
+  image           String
+  recentlyProduct RecentlyProduct[]
 }
 
 model BlacklistToken {
@@ -26,7 +27,7 @@ model Accordion {
   title     String
   body      String
   productId Int
-  Product   Product @relation(fields: [productId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
 }
 
 model Volume {
@@ -34,16 +35,41 @@ model Volume {
   amount    Int
   unit      String
   productId Int
-  Product   Product @relation(fields: [productId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
 }
 
 model Product {
-  id          Int         @id @default(autoincrement())
-  image       String
-  name        String
-  title       String
-  description String
-  accordion   Accordion[]
-  volumes     Volume[]
-  price       Int
+  id              Int               @id @default(autoincrement())
+  image           String
+  name            String
+  title           String
+  description     String
+  accordion       Accordion[]
+  volumes         Volume[]
+  price           Int
+  categories      Category[]
+  recentlyProduct RecentlyProduct[]
+}
+
+model RecentlyProduct {
+  id        Int     @id @default(autoincrement())
+  product   Product @relation(fields: [productId], references: [id])
+  productId Int
+  user      User    @relation(fields: [userId], references: [id])
+  userId    Int
+}
+
+model Category {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  filter    Filter?  @relation(fields: [filterId], references: [id])
+  filterId  Int?
+  product   Product? @relation(fields: [productId], references: [id])
+  productId Int?
+}
+
+model Filter {
+  id         Int        @id @default(autoincrement())
+  name       String     @unique
+  categories Category[]
 }

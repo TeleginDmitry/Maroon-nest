@@ -1,7 +1,22 @@
 import { IsString, IsNumber, IsArray, ValidateNested } from 'class-validator'
 import { Type } from 'class-transformer'
-import { CreateAccordionDto } from './accordion.dto'
-import { CreateVolumeDto } from './volume.dto'
+import { CategoryDto } from '../filter/filter.dto'
+
+export class CreateVolumeDto {
+    @IsNumber()
+    amount: number
+
+    @IsString()
+    unit: string
+}
+
+export class CreateAccordionDto {
+    @IsString()
+    title: string
+
+    @IsString()
+    body: string
+}
 
 export class CreateProductDto {
     @IsString()
@@ -26,6 +41,16 @@ export class CreateProductDto {
     @Type(() => CreateVolumeDto)
     volumes: CreateVolumeDto[]
 
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => CategoryDto)
+    categories: CategoryDto[]
+
     @IsNumber()
     price: number
+}
+
+export class CreateRecentlyProductDto {
+    @IsNumber()
+    productId: number
 }
