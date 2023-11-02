@@ -8,13 +8,14 @@ import {
     UsePipes,
     ValidationPipe,
     Request,
-    UseGuards
+    UseGuards,
+    Query
 } from '@nestjs/common'
 import { ProductService } from './product.service'
 import {
     CreateProductDto,
     CreateRecentlyProductDto
-} from '../../shared/dto/product/product.dto'
+} from 'src/shared/dto/product/product.dto'
 import { JwtAuthGuard } from 'src/guards/jwt.guard'
 
 @Controller('products')
@@ -22,8 +23,9 @@ export class ProductController {
     constructor(private readonly appService: ProductService) {}
 
     @Get()
-    getProducts() {
-        return this.appService.getProducts()
+    getProducts(@Query() params) {
+        const categories = params.categories
+        return this.appService.getProducts(categories)
     }
 
     @Get('recently')
