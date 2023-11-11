@@ -19,7 +19,8 @@ const exceptions = {
         'Токен находится в чёрном списке'
     ),
     incorrect_token: new UnauthorizedException('Невалидный токен'),
-    token_not_exist: new HttpException('Токен не был передан', 400)
+    token_not_exist: new HttpException('Токен не был передан', 400),
+    id_not_number: new HttpException('id имеет неправильный формат', 400)
 }
 
 export default function selectException(exception: keyof typeof exceptions) {

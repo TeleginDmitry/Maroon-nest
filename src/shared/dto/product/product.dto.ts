@@ -1,4 +1,10 @@
-import { IsString, IsNumber, IsArray, ValidateNested } from 'class-validator'
+import {
+    IsString,
+    IsNumber,
+    IsArray,
+    ValidateNested,
+    IsBoolean
+} from 'class-validator'
 import { Type } from 'class-transformer'
 import { CategoryDto } from '../filter/filter.dto'
 
@@ -52,5 +58,24 @@ export class CreateProductDto {
 
 export class CreateRecentlyProductDto {
     @IsNumber()
-    productId: number
+    id: number
+}
+
+export class CreateBasketProductDto {
+    @IsNumber()
+    id: number
+
+    @IsNumber()
+    volume: number
+}
+
+export class PatchBasketProductDto {
+    @IsNumber()
+    id: number
+
+    @IsNumber()
+    count: number
+
+    @IsBoolean()
+    isChecked: boolean
 }

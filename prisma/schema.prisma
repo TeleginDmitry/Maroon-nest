@@ -14,6 +14,7 @@ model User {
   password        String
   image           String
   recentlyProduct RecentlyProduct[]
+  BasketProduct   BasketProduct[]
 }
 
 model BlacklistToken {
@@ -31,11 +32,13 @@ model Accordion {
 }
 
 model Volume {
-  id        Int     @id @default(autoincrement())
-  amount    Int
-  unit      String
-  productId Int
-  product   Product @relation(fields: [productId], references: [id])
+  id              Int            @id @default(autoincrement())
+  amount          Int
+  unit            String
+  productId       Int
+  product         Product        @relation(fields: [productId], references: [id])
+  basketProduct   BasketProduct? @relation(fields: [basketProductId], references: [id])
+  basketProductId Int?
 }
 
 model Product {
@@ -49,6 +52,7 @@ model Product {
   price           Int
   categories      Category[]
   recentlyProduct RecentlyProduct[]
+  basketProduct   BasketProduct[]
 }
 
 model Category {
@@ -72,4 +76,15 @@ model RecentlyProduct {
   productId Int
   user      User    @relation(fields: [userId], references: [id])
   userId    Int
+}
+
+model BasketProduct {
+  id        Int      @id @default(autoincrement())
+  product   Product  @relation(fields: [productId], references: [id])
+  productId Int
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  count     Int      @default(1)
+  isChecked Boolean  @default(true)
+  volumes   Volume[]
 }
