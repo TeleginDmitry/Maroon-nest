@@ -25,7 +25,6 @@ export class CreateAccordionDto {
 }
 
 export class CreateProductDto {
-    @IsString()
     image: string
 
     @IsString()

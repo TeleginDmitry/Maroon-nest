@@ -22,15 +22,39 @@ import {
     PatchBasketProductDto
 } from 'src/shared/dto/product/product.dto'
 import { JwtAuthGuard } from 'src/guards/jwt.guard'
+import { DatabaseService } from '../database/database.service'
 
 @Controller('products')
 export class ProductController {
-    constructor(private readonly productService: ProductService) {}
+    constructor(
+        private readonly productService: ProductService,
+        private readonly databaseService: DatabaseService
+    ) {}
 
     @Get()
-    getProducts(@Query() params) {
-        const categories = params.categories
-        return this.productService.getProducts(categories)
+    async getProducts(@Query() params, @Request() request) {
+        const { limit = 10, offset = 0 } = request.pagination
+        const results = await this.productService.getProducts(params, {
+            limit,
+            offset
+        })
+
+        const totalCount = await this.databaseService.product.count()
+
+        const result = {
+            totalCount,
+            results,
+            nextOffset: offset + limit + 1 > totalCount ? null : offset + limit,
+            previousOffset: offset - limit < 0 ? null : offset - limit
+        }
+
+        return result
+    }
+
+    @Post()
+    @UsePipes(new ValidationPipe())
+    createProduct(@Body() dto: CreateProductDto) {
+        return this.productService.createProduct(dto)
     }
 
     @Get('recently')
@@ -81,11 +105,5 @@ export class ProductController {
     @Get(':id')
     getProduct(@Param('id', ParseIntPipe) id: number) {
         return this.productService.getProduct(id)
-    }
-
-    @Post()
-    @UsePipes(new ValidationPipe())
-    createProduct(@Body() dto: CreateProductDto) {
-        return this.productService.createProduct(dto)
     }
 }

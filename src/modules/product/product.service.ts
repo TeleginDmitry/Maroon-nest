@@ -13,7 +13,9 @@ import selectException from 'src/shared/exceptions/exceptions'
 export class ProductService {
     constructor(private readonly databaseService: DatabaseService) {}
 
-    async getProducts(categories?: string | undefined) {
+    async getProducts(params, { limit, offset }) {
+        const { categories } = params
+
         const query: {
             include: {
                 accordion: boolean
@@ -47,7 +49,11 @@ export class ProductService {
             }
         }
 
-        return await this.databaseService.product.findMany(query)
+        return await this.databaseService.product.findMany({
+            ...query,
+            skip: offset,
+            take: limit
+        })
     }
 
     async getRecentlyProducts(request) {
