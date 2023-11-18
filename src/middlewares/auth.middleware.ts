@@ -1,5 +1,5 @@
 import { Injectable, NestMiddleware } from '@nestjs/common'
-import { TokenService } from '../token/token.service'
+import { TokenService } from '../modules/token/token.service'
 import { Request, Response, NextFunction } from 'express'
 import selectException from 'src/shared/exceptions/exceptions'
 

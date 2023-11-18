@@ -10,7 +10,8 @@ const configurations = {
     secret_jwt: process.env.SECRET_JWT,
     expire_access_token: process.env.EXPIRE_ACCESS_JWT,
     expire_refresh_token: process.env.EXPIRE_REFRESH_JWT,
-    images_folder: process.env.IMAGES_FOLDER
+    images_folder: process.env.IMAGES_FOLDER,
+    server_address: process.env.SERVER_ADDRESS
 }
 
 export function selectConfiguration(

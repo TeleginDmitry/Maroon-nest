@@ -8,7 +8,6 @@ import {
     UserValidatedResponseDto,
     ValidateUserDto
 } from 'src/shared/dto/user/user.dto'
-import { userHook } from 'src/hooks/user.hook'
 
 @Injectable()
 export class UserService {
@@ -56,10 +55,6 @@ export class UserService {
             }
         })
 
-        if (user) {
-            await userHook(user)
-        }
-
         return user
     }
 
@@ -84,10 +79,6 @@ export class UserService {
             }
         })
 
-        if (user) {
-            await userHook(user)
-        }
-
         return user
     }
 
@@ -102,10 +93,6 @@ export class UserService {
             }
         })
 
-        if (user) {
-            await userHook(user)
-        }
-
         return user
     }
 
@@ -113,10 +100,6 @@ export class UserService {
         const user = await this.databaseService.user.findUnique({
             where: { email }
         })
-
-        if (user) {
-            await userHook(user)
-        }
 
         return user
     }

@@ -8,7 +8,7 @@ import { AuthService } from './auth.service'
 import { UserModule } from 'src/modules/user/user.module'
 import { AuthController } from './auth.controller'
 import { TokenModule } from '../token/token.module'
-import { BlacklistTokenMiddleware } from './auth.middleware'
+import { BlacklistTokenMiddleware } from 'src/middlewares/auth.middleware'
 
 @Module({
     imports: [UserModule, TokenModule],
