@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module } from '@nestjs/common'
+import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common'
 import { ProductModule } from '../product/product.module'
 import { UserModule } from '../user/user.module'
 import { DatabaseModule } from '../database/database.module'
@@ -10,6 +10,7 @@ import { CookieParserMiddleware } from 'src/middlewares/cookie-parser.middleware
 import { APP_INTERCEPTOR } from '@nestjs/core'
 import { ResponseImageInterceptor } from 'src/interceptors/response-image.interceptor'
 import { PaginationMiddleware } from 'src/middlewares/pagination.middleware'
+import { PrismaMiddleware } from 'src/middlewares/prisma.middleware'
 
 @Module({
     imports: [
@@ -32,8 +33,19 @@ export class AppModule {
     configure(consumer: MiddlewareConsumer) {
         consumer
             .apply(CookieParserMiddleware)
-            .forRoutes('*')
+            .forRoutes({
+                path: '*',
+                method: RequestMethod.ALL
+            })
             .apply(PaginationMiddleware)
-            .forRoutes('*')
+            .forRoutes({
+                path: '*',
+                method: RequestMethod.ALL
+            })
+            .apply(PrismaMiddleware)
+            .forRoutes({
+                path: '*',
+                method: RequestMethod.ALL
+            })
     }
 }
