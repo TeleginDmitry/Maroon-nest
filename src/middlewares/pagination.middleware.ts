@@ -1,14 +1,16 @@
 import { Injectable, NestMiddleware } from '@nestjs/common'
 import { Response, NextFunction } from 'express'
+import { PaginationType } from 'src/shared/types/pagination/pagination.type'
 
 @Injectable()
 export class PaginationMiddleware implements NestMiddleware {
     use(req, res: Response, next: NextFunction) {
-        const { offset = 0, limit = 10 } = req.query
-        const numOffset = +offset
-        const numLimit = +limit
+        const { page, limit }: PaginationType = req.query
 
-        req.pagination = { offset: numOffset, limit: numLimit }
+        req.pagination = {
+            page: +page,
+            limit: +limit
+        }
         next()
     }
 }

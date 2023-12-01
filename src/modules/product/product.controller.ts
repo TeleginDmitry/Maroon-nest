@@ -22,33 +22,16 @@ import {
     PatchBasketProductDto
 } from 'src/shared/dto/product/product.dto'
 import { JwtAuthGuard } from 'src/guards/jwt.guard'
-import { DatabaseService } from '../database/database.service'
 
 @Controller('products')
 export class ProductController {
-    constructor(
-        private readonly productService: ProductService,
-        private readonly databaseService: DatabaseService
-    ) {}
+    constructor(private readonly productService: ProductService) {}
 
     @Get()
     async getProducts(@Query() params, @Request() request) {
-        const { limit = 10, offset = 0 } = request.pagination
-        const results = await this.productService.getProducts(params, {
-            limit,
-            offset
-        })
+        params = { ...params, ...request.pagination }
 
-        const totalCount = await this.databaseService.product.count()
-
-        const result = {
-            totalCount,
-            results,
-            nextOffset: offset + limit + 1 > totalCount ? null : offset + limit,
-            previousOffset: offset - limit < 0 ? null : offset - limit
-        }
-
-        return result
+        return await this.productService.getProducts(params)
     }
 
     @Post()

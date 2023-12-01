@@ -8,52 +8,58 @@ import {
 } from '../../shared/dto/product/product.dto'
 import { UserValidatedResponseDto } from 'src/shared/dto/user/user.dto'
 import selectException from 'src/shared/exceptions/exceptions'
+import {
+    PaginationResponseType,
+    PaginationType
+} from 'src/shared/types/pagination/pagination.type'
 
 @Injectable()
 export class ProductService {
     constructor(private readonly databaseService: DatabaseService) {}
 
-    async getProducts(params, { limit, offset }) {
-        const { categories } = params
+    async getProducts(params: PaginationType) {
+        const { categories, page, limit } = params
 
-        const query: {
-            include: {
-                accordion: boolean
-                volumes: boolean
-            }
-            where?: {
-                categories?: {
-                    some?: {
-                        OR?: any
-                    }
-                }
-            }
-        } = {
+        const categoriesArray =
+            typeof categories === 'string' ? categories.split(',') : []
+
+        const products = await this.databaseService.product.findMany({
+            where: {
+                categories: !!categoriesArray.length
+                    ? {
+                          some: {
+                              name: {
+                                  in: categoriesArray
+                              }
+                          }
+                      }
+                    : {}
+            },
             include: {
                 accordion: true,
                 volumes: true
-            }
-        }
-
-        if (categories?.length) {
-            const categoriesArray = categories.split(',')
-
-            query.where = {
-                categories: {
-                    some: {
-                        OR: categoriesArray.map((category) => ({
-                            name: category
-                        }))
-                    }
-                }
-            }
-        }
-
-        return await this.databaseService.product.findMany({
-            ...query,
-            skip: offset,
+            },
+            skip: page * limit,
             take: limit
         })
+
+        const totalItems = await this.databaseService.product.count()
+
+        const countElementsNextPage = await this.databaseService.product.count({
+            skip: (page + 1) * limit,
+            take: limit
+        })
+
+        const result: PaginationResponseType<typeof products> = {
+            results: products,
+            totalItems,
+            totalPages: Math.ceil(totalItems / limit),
+            currentPage: page,
+            previousPage: page - 1 < 0 ? null : page - 1,
+            nextPage: !!countElementsNextPage ? page + 1 : null
+        }
+
+        return result
     }
 
     async getRecentlyProducts(request) {
